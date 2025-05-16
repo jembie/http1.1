@@ -10,8 +10,8 @@ def do_GET(path: str) -> str:
 def do_POST(path: str) -> str: ...
 
 
-def make_response(resp: str, path):
-    match resp:
+def make_response(method: str, path):
+    match method:
         case "GET":
             return do_GET(path=path)
 
