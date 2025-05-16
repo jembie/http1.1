@@ -1,6 +1,18 @@
 import socket
 
 
+def bad_request() -> str:
+    return build_response(
+        status_code="HTTP/1.1 400 Bad Request", headers={"Connection": "close"}, body="<html><body><h1>400 Bad Request</h1></body></html>"
+    )
+
+
+def build_response(status_code: str, headers: dict, body: str) -> str:
+    header_lines = [f"{key}: {value}" for key, value in headers.items()]
+    response = f"{status_code}\r\n" + "\r\n".join(header_lines) + "\r\n\r\n" + body
+    return response
+
+
 def do_GET(path: str) -> str:
     body = f"<html><body><h1>You requested: {path}</h1></body></html>"
     headers = {"Content-Type": "text/html; charset=utf-8", "Content-Length": str(len(body)), "Connection": "close"}
@@ -17,18 +29,6 @@ def make_response(method: str, path):
 
         case _:
             return "HTTP/1.1 405 Method Not Allowed\r\n" "Connection: close\r\n" "\r\n"
-
-
-def build_response(status_code: str, headers: dict, body: str) -> str:
-    header_lines = [f"{key}: {value}" for key, value in headers.items()]
-    response = f"{status_code}\r\n" + "\r\n".join(header_lines) + "\r\n\r\n" + body
-    return response
-
-
-def bad_request() -> str:
-    return build_response(
-        status_code="HTTP/1.1 400 Bad Request", headers={"Connection": "close"}, body="<html><body><h1>400 Bad Request</h1></body></html>"
-    )
 
 
 def main():
@@ -56,7 +56,7 @@ def main():
             client_connection.close()
             continue
 
-        response = make_response(resp=method, path=path)
+        response = make_response(method=method, path=path)
 
         client_connection.sendall(response.encode("utf-8"))
         client_connection.close()
